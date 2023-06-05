@@ -19,7 +19,7 @@ module.exports = {
         unique: true,
         type: Sequelize.STRING,
       },
-      publicationDate: {
+      publication_date: {
         allowNull: false,
         type: Sequelize.STRING,
       },
