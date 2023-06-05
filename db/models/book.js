@@ -3,8 +3,6 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Book extends Model {
     static associate(models) {
-      this.belongsTo(models.author, { foreignKey: "author_id" });
-
       this.hasMany(models.bookreview, { foreignKey: "book_id" });
       this.hasMany(models.discussion, { foreignKey: "book_id" });
       this.hasMany(models.userbook, { foreignKey: "book_id" });
@@ -25,21 +23,17 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         field: "isbn",
       },
-      averageRating: {
-        type: DataTypes.DECIMAL(10, 2),
-        field: "average_rating",
-      },
-      authorId: {
-        type: DataTypes.INTEGER,
-        field: "author_id",
-        references: {
-          model: "author",
-          key: "id",
-        },
+      authors: {
+        type: DataTypes.STRING,
+        field: "authors",
       },
       publicationDate: {
         type: DataTypes.STRING,
         field: "publication_date",
+      },
+      averageRating: {
+        type: DataTypes.DECIMAL(10, 2),
+        field: "average_rating",
       },
       createdAt: {
         type: DataTypes.DATE,

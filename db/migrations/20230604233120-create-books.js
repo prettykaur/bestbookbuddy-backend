@@ -15,8 +15,11 @@ module.exports = {
         type: Sequelize.STRING,
       },
       isbn: {
-        allowNull: false,
         unique: true,
+        type: Sequelize.STRING,
+      },
+      authors: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
       publication_date: {
@@ -25,14 +28,6 @@ module.exports = {
       },
       average_rating: {
         type: Sequelize.DECIMAL(10, 2),
-      },
-      author_id: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-        references: {
-          model: "authors",
-          key: "id",
-        },
       },
       created_at: {
         allowNull: false,

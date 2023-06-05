@@ -62,10 +62,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         field: "username",
       },
-      auth0Sub: {
-        type: DataTypes.STRING,
-        field: "auth0Sub",
-      },
       address: {
         type: DataTypes.STRING,
         field: "address",

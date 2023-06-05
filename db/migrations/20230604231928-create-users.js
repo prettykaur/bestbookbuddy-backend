@@ -20,11 +20,6 @@ module.exports = {
         unique: true,
         type: Sequelize.STRING,
       },
-      auth0Sub: {
-        allowNull: false,
-        unique: true,
-        type: Sequelize.STRING,
-      },
       address: {
         type: Sequelize.STRING,
       },
