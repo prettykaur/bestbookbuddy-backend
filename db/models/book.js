@@ -19,21 +19,45 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         field: "title",
       },
-      isbn: {
+      olEditionKey: {
         type: DataTypes.STRING,
-        field: "isbn",
+        field: "ol_edition_key",
       },
-      authors: {
+      olEditionCount: {
+        type: DataTypes.INTEGER,
+        field: "ol_edition_count",
+      },
+      isbn10: {
+        type: DataTypes.INTEGER,
+        field: "isbn_10",
+      },
+      isbn13: {
+        type: DataTypes.INTEGER,
+        field: "isbn_13",
+      },
+      olCoverId: {
+        type: DataTypes.INTEGER,
+        field: "ol_cover_id",
+      },
+      olRatingsCount: {
+        type: DataTypes.INTEGER,
+        field: "ol_ratings_count",
+      },
+      olRatingsAverage: {
+        type: DataTypes.FLOAT,
+        field: "ol_ratings_average",
+      },
+      usersRatingsAverage: {
+        type: DataTypes.FLOAT,
+        field: "users_ratings_average",
+      },
+      olAuthorKey: {
         type: DataTypes.STRING,
-        field: "authors",
+        field: "ol_author_key",
       },
-      publicationDate: {
+      authorName: {
         type: DataTypes.STRING,
-        field: "publication_date",
-      },
-      averageRating: {
-        type: DataTypes.DECIMAL(10, 2),
-        field: "average_rating",
+        field: "author_name",
       },
       createdAt: {
         type: DataTypes.DATE,
