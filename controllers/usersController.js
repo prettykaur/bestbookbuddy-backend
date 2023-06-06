@@ -8,32 +8,22 @@ class UsersController extends BaseController {
 
   // Create new user in db
   createUser = async (req, res) => {
-    const { username: nickname, email, photoUrl: picture } = req.body;
+    const { username, email, photoUrl } = req.body;
 
     try {
       // Check if the user already exists in the db based on email
-      const [user, created] = await this.model.findOrCreate({
+      const [user] = await this.model.findOrCreate({
         where: { email },
-        default: {
-          username: nickname,
+        defaults: {
+          username,
           email: email,
-          photoUrl: picture,
+          photoUrl,
           lastLogin: new Date(),
         },
       });
 
-      if (created) {
-        return res.json(user);
-      } else {
-        user.username = nickname;
-        user.email = email;
-        user.photoUrl = picture;
-        user.lastLogin = new Date();
-
-        await user.save();
-
-        return res.json(user);
-      }
+      return res.json(user);
+      // }
     } catch (err) {
       console.log("Error creating user:", err);
       return res.status(400).json({ error: true, msg: err });
