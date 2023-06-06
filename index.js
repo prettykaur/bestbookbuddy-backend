@@ -22,13 +22,13 @@ const FriendsController = require("./controllers/friendsController");
 
 // Import db
 const db = require("./db/models/index");
-const { user, book, friend, friendrequest, friendrequeststatus } = db;
+const { user, book, friendrequest, friendrequeststatus } = db;
 
 // Initialise controllers
 const usersController = new UsersController(user);
 const booksController = new BooksController(book);
 const friendsController = new FriendsController(
-  friend,
+  user,
   friendrequest,
   friendrequeststatus
 );
