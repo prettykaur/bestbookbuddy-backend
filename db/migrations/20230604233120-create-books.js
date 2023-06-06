@@ -14,20 +14,42 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      isbn: {
+      ol_edition_key: {
         unique: true,
         type: Sequelize.STRING,
       },
-      authors: {
+      ol_edition_count: {
+        unique: true,
+        type: Sequelize.INTEGER,
+      },
+      isbn_10: {
+        unique: true,
+        type: Sequelize.INTEGER,
+      },
+      isbn_13: {
+        unique: true,
+        type: Sequelize.INTEGER,
+      },
+      ol_cover_id: {
+        unique: true,
+        type: Sequelize.INTEGER,
+      },
+      ol_ratings_count: {
+        type: Sequelize.INTEGER,
+      },
+      ol_ratings_average: {
+        type: Sequelize.FLOAT,
+      },
+      users_ratings_average: {
+        type: Sequelize.FLOAT,
+      },
+      ol_author_key: {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      publication_date: {
+      author_name: {
         allowNull: false,
         type: Sequelize.STRING,
-      },
-      average_rating: {
-        type: Sequelize.DECIMAL(10, 2),
       },
       created_at: {
         allowNull: false,
