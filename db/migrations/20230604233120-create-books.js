@@ -32,7 +32,7 @@ module.exports = {
       },
       ol_cover_id: {
         unique: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
       },
       ol_ratings_count: {
         type: Sequelize.INTEGER,
