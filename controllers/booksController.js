@@ -2,9 +2,8 @@ const BaseController = require("./baseController");
 const { Op } = require("sequelize");
 
 class BooksController extends BaseController {
-  constructor(model, bookModel) {
+  constructor(model) {
     super(model);
-    this.bookModel = bookModel;
   }
 
   // Create book in db

@@ -10,7 +10,6 @@ class BooksRouter {
   routes() {
     router.post("/", this.controller.createBook);
     router.get("/:bookId", this.controller.getBook);
-
     return router;
   }
 }
