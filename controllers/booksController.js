@@ -24,21 +24,19 @@ class BooksController extends BaseController {
 
     try {
       // Check if book already exists in db
-      const existingBook = await this.bookModel.findOne({
+      const existingBook = await this.model.findOne({
         where: {
           title,
-          [Op.or]: [{ isbn10 }, [isbn13]],
+          [Op.or]: [{ isbn10 }, { isbn13 }],
         },
       });
 
       if (existingBook) {
-        return res
-          .status(400)
-          .json({ error: true, msg: "Book already exists" });
+        return res.json(existingBook);
       }
 
       // Create new book record in db
-      const newBook = await this.bookModel.create({
+      const newBook = await this.model.create({
         title,
         olEditionKey,
         olEditionCount,
@@ -63,7 +61,7 @@ class BooksController extends BaseController {
     const { bookId } = req.params;
 
     try {
-      const book = await this.bookModel.findByPk(bookId);
+      const book = await this.model.findByPk(bookId);
 
       return res.json(book);
     } catch (err) {

@@ -28,15 +28,15 @@ module.exports = (sequelize, DataTypes) => {
         field: "ol_edition_count",
       },
       isbn10: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         field: "isbn_10",
       },
       isbn13: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         field: "isbn_13",
       },
       olCoverId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         field: "ol_cover_id",
       },
       olRatingsCount: {
