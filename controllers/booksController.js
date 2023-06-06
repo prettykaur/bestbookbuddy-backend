@@ -31,9 +31,7 @@ class BooksController extends BaseController {
       });
 
       if (existingBook) {
-        return res
-          .status(400)
-          .json({ error: true, msg: "Book already exists" });
+        return res.json(existingBook);
       }
 
       // Create new book record in db

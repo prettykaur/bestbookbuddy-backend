@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const BaseController = require("./baseController");
 const { Op } = require("sequelize");
 
