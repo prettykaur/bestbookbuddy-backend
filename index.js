@@ -13,22 +13,30 @@ const checkJwt = auth({
 // Import routers
 const UsersRouter = require("./routers/usersRouter");
 const BooksRouter = require("./routers/booksRouter");
+const FriendsRouter = require("./routers/friendsRouter");
 
 // Import controllers
 const UsersController = require("./controllers/usersController");
 const BooksController = require("./controllers/booksController");
+const FriendsController = require("./controllers/friendsController");
 
 // Import db
 const db = require("./db/models/index");
-const { user, book } = db;
+const { user, book, friendrequest, friendrequeststatus } = db;
 
 // Initialise controllers
 const usersController = new UsersController(user);
 const booksController = new BooksController(book);
+const friendsController = new FriendsController(
+  user,
+  friendrequest,
+  friendrequeststatus
+);
 
 // Initialise routers
 const usersRouter = new UsersRouter(usersController, checkJwt).routes();
 const booksRouter = new BooksRouter(booksController, checkJwt).routes();
+const friendsRouter = new FriendsRouter(friendsController, checkJwt).routes();
 
 // Enable CORS
 app.use(cors());
@@ -40,6 +48,7 @@ app.use(express.urlencoded({ extended: false }));
 // Use routers
 app.use("/users", usersRouter);
 app.use("/books", booksRouter);
+app.use("/friends", friendsRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
