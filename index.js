@@ -1,9 +1,14 @@
 const cors = require("cors");
 const express = require("express");
 require("dotenv").config();
+const { auth } = require("express-oauth2-jwt-bearer");
 
 const PORT = process.env.PORT || 3000;
 const app = express();
+const checkJwt = auth({
+  audience: process.env.AUTH_AUDIENCE,
+  issuerBaseURL: process.env.AUTH_DOMAIN,
+});
 
 // Import routers
 const UsersRouter = require("./routers/usersRouter");
@@ -19,7 +24,7 @@ const { user } = db;
 const usersController = new UsersController(user);
 
 // Initialise routers
-const usersRouter = new UsersRouter(usersController).routes();
+const usersRouter = new UsersRouter(usersController, checkJwt).routes();
 
 // Enable CORS
 app.use(cors());
