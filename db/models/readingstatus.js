@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "readingstatus",
+      tableName: "reading_status",
       underscored: true,
       timestamps: true,
     }
