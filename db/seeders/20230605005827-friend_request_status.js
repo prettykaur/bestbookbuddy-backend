@@ -7,17 +7,17 @@ module.exports = {
       "friend_request_status",
       [
         {
-          status: "Pending",
+          status: "pending",
           created_at: new Date(),
           updated_at: new Date(),
         },
         {
-          status: "Accepted",
+          status: "accepted",
           created_at: new Date(),
           updated_at: new Date(),
         },
         {
-          status: "Rejected",
+          status: "rejected",
           created_at: new Date(),
           updated_at: new Date(),
         },

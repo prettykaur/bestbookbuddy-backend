@@ -7,22 +7,22 @@ module.exports = {
       "reading_status",
       [
         {
-          status: "To read",
+          status: "to-read",
           created_at: new Date(),
           updated_at: new Date(),
         },
         {
-          status: "Reading",
+          status: "reading",
           created_at: new Date(),
           updated_at: new Date(),
         },
         {
-          status: "Read",
+          status: "read",
           created_at: new Date(),
           updated_at: new Date(),
         },
         {
-          status: "DNF",
+          status: "dnf",
           created_at: new Date(),
           updated_at: new Date(),
         },
