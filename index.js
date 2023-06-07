@@ -14,15 +14,24 @@ const checkJwt = auth({
 const UsersRouter = require("./routers/usersRouter");
 const BooksRouter = require("./routers/booksRouter");
 const FriendsRouter = require("./routers/friendsRouter");
+const LibraryRouter = require("./routers/libraryRouter");
 
 // Import controllers
 const UsersController = require("./controllers/usersController");
 const BooksController = require("./controllers/booksController");
 const FriendsController = require("./controllers/friendsController");
+const LibraryController = require("./controllers/libraryController");
 
 // Import db
 const db = require("./db/models/index");
-const { user, book, friendrequest, friendrequeststatus } = db;
+const {
+  user,
+  book,
+  friendrequest,
+  friendrequeststatus,
+  userbook,
+  readingstatus,
+} = db;
 
 // Initialise controllers
 const usersController = new UsersController(user);
@@ -32,11 +41,18 @@ const friendsController = new FriendsController(
   friendrequest,
   friendrequeststatus
 );
+const libraryController = new LibraryController(
+  userbook,
+  book,
+  readingstatus,
+  user
+);
 
 // Initialise routers
 const usersRouter = new UsersRouter(usersController, checkJwt).routes();
 const booksRouter = new BooksRouter(booksController, checkJwt).routes();
 const friendsRouter = new FriendsRouter(friendsController, checkJwt).routes();
+const libraryRouter = new LibraryRouter(libraryController, checkJwt).routes();
 
 // Enable CORS
 app.use(cors());
@@ -49,6 +65,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/users", usersRouter);
 app.use("/books", booksRouter);
 app.use("/friends", friendsRouter);
+app.use("/library", libraryRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
