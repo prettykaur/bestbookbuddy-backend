@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsToMany(models.bookreview, {
         through: "book_review_likes",
         foreignKey: "user_id",
+        as: "likedReviews",
       });
       this.belongsToMany(models.discussion, {
         through: "user_discussions",

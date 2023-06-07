@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsToMany(models.user, {
         through: "book_review_likes",
         foreignKey: "review_id",
+        as: "likedBy",
       });
     }
   }
@@ -52,6 +53,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "bookreview",
+      tableName: "book_reviews",
       underscored: true,
       timestamps: true,
     }
