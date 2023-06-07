@@ -16,6 +16,7 @@ const BooksRouter = require("./routers/booksRouter");
 const FriendsRouter = require("./routers/friendsRouter");
 const LibraryRouter = require("./routers/libraryRouter");
 const ReviewsRouter = require("./routers/reviewsRouter");
+const CollectionsRouter = require("./routers/collectionsRouter");
 
 // Import controllers
 const UsersController = require("./controllers/usersController");
@@ -23,6 +24,7 @@ const BooksController = require("./controllers/booksController");
 const FriendsController = require("./controllers/friendsController");
 const LibraryController = require("./controllers/libraryController");
 const ReviewsController = require("./controllers/reviewsController");
+const CollectionsController = require("./controllers/collectionsController");
 
 // Import db
 const db = require("./db/models/index");
@@ -34,6 +36,7 @@ const {
   userbook,
   readingstatus,
   bookreview,
+  collection,
 } = db;
 
 // Initialise controllers
@@ -51,6 +54,7 @@ const libraryController = new LibraryController(
   user
 );
 const reviewsController = new ReviewsController(bookreview, book, user);
+const collectionsController = new CollectionsController(collection, book, user);
 
 // Initialise routers
 const usersRouter = new UsersRouter(usersController, checkJwt).routes();
@@ -58,6 +62,10 @@ const booksRouter = new BooksRouter(booksController, checkJwt).routes();
 const friendsRouter = new FriendsRouter(friendsController, checkJwt).routes();
 const libraryRouter = new LibraryRouter(libraryController, checkJwt).routes();
 const reviewsRouter = new ReviewsRouter(reviewsController, checkJwt).routes();
+const collectionsRouter = new CollectionsRouter(
+  collectionsController,
+  checkJwt
+).routes();
 
 // Enable CORS
 app.use(cors());
@@ -72,6 +80,7 @@ app.use("/books", booksRouter);
 app.use("/friends", friendsRouter);
 app.use("/library", libraryRouter);
 app.use("/reviews", reviewsRouter);
+app.use("/collections", collectionsRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");

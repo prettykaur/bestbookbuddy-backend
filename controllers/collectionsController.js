@@ -1,8 +1,10 @@
 const BaseController = require("./baseController");
 
 class CollectionsController extends BaseController {
-  constructor(model) {
+  constructor(model, bookModel, userModel) {
     super(model);
+    this.bookModel = bookModel;
+    this.userModel = userModel;
   }
 
   // Get all collections
