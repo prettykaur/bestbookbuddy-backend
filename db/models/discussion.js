@@ -7,8 +7,14 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.book, { foreignKey: "book_id" });
 
       // Self-referential association
-      this.hasMany(models.discussion, { foreignKey: "parent_id" });
-      this.belongsTo(models.discussion, { foreignKey: "parent_id" });
+      this.hasMany(models.discussion, {
+        foreignKey: "parent_id",
+        as: "children",
+      });
+      this.belongsTo(models.discussion, {
+        foreignKey: "parent_id",
+        as: "parentDiscussion",
+      });
 
       this.belongsToMany(models.user, {
         through: "user_discussions",
