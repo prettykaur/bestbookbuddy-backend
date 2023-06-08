@@ -6,21 +6,26 @@ module.exports = {
     await queryInterface.changeColumn("discussions", "parent_id", {
       type: Sequelize.INTEGER,
       allowNull: true,
+    });
+    await queryInterface.addConstraint("discussions", {
+      fields: ["parent_id"],
+      type: "foreign key",
+      name: "discussions_parent_id_fkey",
       references: {
-        model: "discussions",
-        key: "id",
+        table: "discussions",
+        field: "id",
       },
     });
   },
 
   async down(queryInterface, Sequelize) {
+    await queryInterface.removeConstraint(
+      "discussions",
+      "discussions_parent_id_fkey"
+    );
     await queryInterface.changeColumn("discussions", "parent_id", {
       type: Sequelize.INTEGER,
       allowNull: false,
-      references: {
-        model: "discussions",
-        key: "id",
-      },
     });
   },
 };
