@@ -17,6 +17,7 @@ const FriendsRouter = require("./routers/friendsRouter");
 const LibraryRouter = require("./routers/libraryRouter");
 const ReviewsRouter = require("./routers/reviewsRouter");
 const CollectionsRouter = require("./routers/collectionsRouter");
+const DiscussionsRouter = require("./routers/discussionsRouter");
 
 // Import controllers
 const UsersController = require("./controllers/usersController");
@@ -25,6 +26,7 @@ const FriendsController = require("./controllers/friendsController");
 const LibraryController = require("./controllers/libraryController");
 const ReviewsController = require("./controllers/reviewsController");
 const CollectionsController = require("./controllers/collectionsController");
+const DiscussionsController = require("./controllers/discussionsController");
 
 // Import db
 const db = require("./db/models/index");
@@ -37,6 +39,7 @@ const {
   readingstatus,
   bookreview,
   collection,
+  discussion,
 } = db;
 
 // Initialise controllers
@@ -55,6 +58,7 @@ const libraryController = new LibraryController(
 );
 const reviewsController = new ReviewsController(bookreview, book, user);
 const collectionsController = new CollectionsController(collection, book, user);
+const discussionsController = new DiscussionsController(discussion, book, user);
 
 // Initialise routers
 const usersRouter = new UsersRouter(usersController, checkJwt).routes();
@@ -64,6 +68,10 @@ const libraryRouter = new LibraryRouter(libraryController, checkJwt).routes();
 const reviewsRouter = new ReviewsRouter(reviewsController, checkJwt).routes();
 const collectionsRouter = new CollectionsRouter(
   collectionsController,
+  checkJwt
+).routes();
+const discussionsRouter = new DiscussionsRouter(
+  discussionsController,
   checkJwt
 ).routes();
 
@@ -81,6 +89,7 @@ app.use("/friends", friendsRouter);
 app.use("/library", libraryRouter);
 app.use("/reviews", reviewsRouter);
 app.use("/collections", collectionsRouter);
+app.use("/discussions", discussionsRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
