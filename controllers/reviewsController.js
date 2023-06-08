@@ -40,7 +40,7 @@ class ReviewsController extends BaseController {
   // Add review for book
   addBookReview = async (req, res) => {
     const { bookId } = req.params;
-    const { userId, rating, body } = req.body;
+    const { userId, rating, title, body } = req.body;
 
     try {
       const existingReview = await this.model.findAll({
@@ -58,6 +58,7 @@ class ReviewsController extends BaseController {
         userId,
         bookId,
         rating,
+        title,
         body,
       });
 
@@ -83,7 +84,7 @@ class ReviewsController extends BaseController {
   // Update book review
   updateBookReview = async (req, res) => {
     const { reviewId } = req.params;
-    const { userId, rating, body } = req.body;
+    const { userId, rating, title, body } = req.body;
 
     try {
       const existingReview = await this.model.findOne({
@@ -95,6 +96,7 @@ class ReviewsController extends BaseController {
       }
 
       existingReview.rating = rating;
+      existingReview.title = title;
       existingReview.body = body;
       await existingReview.save();
 
