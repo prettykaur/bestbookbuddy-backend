@@ -35,6 +35,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         field: "rating",
       },
+      title: {
+        type: DataTypes.STRING,
+        field: "title",
+      },
       body: {
         type: DataTypes.STRING,
         field: "body",
