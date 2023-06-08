@@ -75,12 +75,13 @@ class CollectionsController extends BaseController {
 
   // Create new collection
   createCollection = async (req, res) => {
-    const { userId, name } = req.body;
+    const { userId, name, description } = req.body;
 
     try {
       const newCollection = await this.model.create({
         userId,
         name,
+        description,
       });
       return res.json(newCollection);
     } catch (err) {
@@ -128,14 +129,14 @@ class CollectionsController extends BaseController {
   // Update collection
   updateCollection = async (req, res) => {
     const { userId, collectionId } = req.params;
-    const { name } = req.body;
+    const { name, description } = req.body;
 
     try {
       const collection = await this.model.findByPk(collectionId);
 
       if (collection) {
         await this.model.update(
-          { name },
+          { name, description },
           { where: { id: collectionId, userId } }
         );
 
