@@ -232,6 +232,14 @@ class DiscussionsController extends BaseController {
     const { userId, body } = req.body;
 
     try {
+      const discussion = await this.model.findByPk(discussionId);
+
+      if (!discussion) {
+        return res
+          .status(404)
+          .json({ error: true, msg: "Discussion not found" });
+      }
+
       const newComment = await this.model.create({
         userId,
         bookId,
