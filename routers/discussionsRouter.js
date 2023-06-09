@@ -12,6 +12,35 @@ class DiscussionsRouter {
     router.get("/user/:userId", this.controller.getDiscussionsByUser);
     router.get("/user/:userId/comments", this.controller.getCommentsByUser);
 
+    router.get(
+      "/:discussionId/likes",
+      this.controller.getUsersWhoLikedDiscussion
+    );
+    router.get(
+      "/:discussionId/likes/count",
+      this.controller.countDiscussionLikes
+    );
+
+    router.get(
+      "/user/:userId/likes",
+      this.controller.getDiscussionsLikedByUser
+    );
+    router.get(
+      "/user/:userId/likes/count",
+      this.controller.countLikedDiscussionsByUser
+    );
+
+    router.post(
+      "/:discussionId/like",
+      this.checkJwt,
+      this.controller.likeDiscussion
+    );
+    router.delete(
+      "/:discussionId/unlike",
+      this.checkJwt,
+      this.controller.unlikeDiscussion
+    );
+
     router.get("/:discussionId", this.controller.getDiscussion);
     router.get("/:discussionId/:commentId", this.controller.getComment);
 
