@@ -8,23 +8,17 @@ class LibraryRouter {
   }
 
   routes() {
-    router.get(
-      "/:userId/:status",
-      this.checkJwt,
-      this.controller.getBooksInLibrary
-    );
-    router.post(
-      "/:userId/:status",
-      this.checkJwt,
-      this.controller.addBookToLibrary
-    );
+    router.get("/:userId", this.controller.getBooksInLibrary);
+    router.get("/:userId/:bookId", this.controller.getBookStatusInLibrary);
+
+    router.post("/:userId", this.checkJwt, this.controller.addBookToLibrary);
     router.put(
-      "/:userId/:status/:bookId",
+      "/:userId/:bookId",
       this.checkJwt,
       this.controller.updateBookInLibrary
     );
     router.delete(
-      "/:userId/:status/:bookId",
+      "/:userId/:bookId",
       this.checkJwt,
       this.controller.deleteBookFromLibrary
     );
