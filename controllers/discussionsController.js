@@ -425,6 +425,225 @@ class DiscussionsController extends BaseController {
       return res.status(500).json({ error: true, msg: err.message });
     }
   };
+
+  // Get all users who liked discussion
+  getUsersWhoLikedDiscussion = async (req, res) => {
+    const { discussionId } = req.params;
+
+    try {
+      const discussion = await this.model.findOne({
+        where: { id: discussionId },
+        include: [
+          {
+            model: this.userModel,
+            through: "user_discussions",
+            as: "likingUsers",
+            attributes: ["id", "username", "email", "photoUrl"],
+          },
+        ],
+      });
+
+      if (!discussion) {
+        return res
+          .status(404)
+          .json({ error: true, msg: "Discussion not found" });
+      }
+
+      return res.json(discussion.likingUsers);
+    } catch (err) {
+      console.log("Error getting users who liked discussion:", err);
+      return res.status(500).json({ error: true, msg: err.message });
+    }
+  };
+
+  // Count likes for discussion
+  countDiscussionLikes = async (req, res) => {
+    const { discussionId } = req.params;
+
+    try {
+      const discussion = await this.model.findOne({
+        where: { id: discussionId },
+        include: [
+          {
+            model: this.userModel,
+            through: "user_discussions",
+            as: "likingUsers",
+          },
+        ],
+      });
+
+      if (!discussion) {
+        return res
+          .status(404)
+          .json({ error: true, msg: "Discussion not found" });
+      }
+
+      return res.json({ likesCount: discussion.likingUsers.length });
+    } catch (err) {
+      console.log("Error counting likes for discussion:", err);
+      return res.status(500).json({ error: true, msg: err.message });
+    }
+  };
+
+  // Get discussions liked by user
+  getDiscussionsLikedByUser = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+      const user = await this.userModel.findOne({
+        where: { id: userId },
+        include: [
+          {
+            model: this.model,
+            through: "user_discussions",
+            as: "likedDiscussions",
+          },
+        ],
+      });
+
+      if (!user) {
+        return res.json({ error: true, msg: "User not found" });
+      }
+
+      return res.json(user.likedDiscussions);
+    } catch (err) {
+      console.log("Error getting discussions liked by user:", err);
+      return res.status(500).json({ error: true, msg: err.message });
+    }
+  };
+
+  // Count number of discussions liked by user
+  countLikedDiscussionsByUser = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+      const user = await this.userModel.findOne({
+        where: { id: userId },
+        include: [
+          {
+            model: this.model,
+            through: "user_discussions",
+            as: "likedDiscussions",
+          },
+        ],
+      });
+
+      if (!user) {
+        return res.json({ error: true, msg: "User not found" });
+      }
+
+      return res.json({ likedDiscussionsCount: user.likedDiscussions.length });
+    } catch (err) {
+      console.log("Error counting discussions liked by user:", err);
+      return res.status(500).json({ error: true, msg: err.message });
+    }
+  };
+
+  // Like discussion
+  likeDiscussion = async (req, res) => {
+    const { discussionId } = req.params;
+    const { userId } = req.body;
+
+    try {
+      const discussion = await this.model.findOne({
+        where: { id: discussionId },
+        include: [
+          {
+            model: this.userModel,
+            as: "likingUsers",
+          },
+        ],
+      });
+
+      if (!discussion) {
+        return res
+          .status(404)
+          .json({ error: true, msg: "Discussion not found" });
+      }
+
+      const user = await this.userModel.findOne({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        return res.status(404).json({ error: true, msg: "User not found" });
+      }
+
+      const alreadyLiked = discussion.likingUsers.some(
+        (likingUser) => likingUser.id === userId
+      );
+
+      if (alreadyLiked) {
+        return res
+          .status(400)
+          .json({ error: true, msg: "User already liked this discussion" });
+      }
+
+      await discussion.addLikingUser(user);
+
+      return res.json({
+        success: true,
+        msg: "Discussion liked successfully",
+        discussion,
+      });
+    } catch (err) {
+      console.log("Error liking discussion:", err);
+      return res.status(500).json({ error: true, msg: err.message });
+    }
+  };
+
+  // Unlike discussion
+  unlikeDiscussion = async (req, res) => {
+    const { discussionId } = req.params;
+    const { userId } = req.body;
+
+    try {
+      const discussion = await this.model.findOne({
+        where: { id: discussionId },
+        include: [
+          {
+            model: this.userModel,
+            as: "likingUsers",
+          },
+        ],
+      });
+
+      if (!discussion) {
+        return res
+          .status(404)
+          .json({ error: true, msg: "Discussion not found" });
+      }
+
+      const user = await this.userModel.findOne({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        return res.status(404).json({ error: true, msg: "User not found" });
+      }
+
+      const alreadyLiked = discussion.likingUsers.some(
+        (likingUser) => likingUser.id === userId
+      );
+
+      if (!alreadyLiked) {
+        return res
+          .status(400)
+          .json({ error: true, msg: "User has not liked this discussion yet" });
+      }
+
+      await discussion.removeLikingUser(user);
+
+      return res.json({
+        success: true,
+        msg: "Discussion unliked successfully",
+        discussion,
+      });
+    } catch (err) {
+      console.log("Error unliking discussion:", err);
+      return res.status(500).json({ error: true, msg: err.message });
+    }
+  };
 }
 
 module.exports = DiscussionsController;
