@@ -1,10 +1,11 @@
 const BaseController = require("./baseController");
 
 class ReviewsController extends BaseController {
-  constructor(model, bookModel, userModel) {
+  constructor(model, bookModel, userModel, activityModel) {
     super(model);
     this.bookModel = bookModel;
     this.userModel = userModel;
+    this.activityModel = activityModel;
   }
 
   // Get reviews for book
@@ -62,6 +63,18 @@ class ReviewsController extends BaseController {
         body,
       });
 
+      // Log activity
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "created",
+          targetId: newReview.id,
+          targetType: "review",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
+      }
+
       // Eager load user and book data
       const reviewWithDetails = await this.model.findOne({
         where: { id: newReview.id },
@@ -99,6 +112,18 @@ class ReviewsController extends BaseController {
       existingReview.title = title;
       existingReview.body = body;
       await existingReview.save();
+
+      // Log activity
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "updated",
+          targetId: existingReview.id,
+          targetType: "review",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
+      }
 
       // Eager load user and book data
       const updatedReview = await this.model.findOne({
@@ -215,9 +240,21 @@ class ReviewsController extends BaseController {
     try {
       const user = await this.userModel.findByPk(userId);
       const bookReview = await this.model.findByPk(reviewId);
+      console.log(Object.keys(user.__proto__));
 
       if (user && bookReview) {
         await user.addLikedReviews(bookReview);
+        // Log activity
+        try {
+          await this.activityModel.create({
+            userId,
+            activityType: "liked",
+            targetId: reviewId,
+            targetType: "review",
+          });
+        } catch (activityError) {
+          console.log("Failed to log activity:", activityError);
+        }
         return res.json({ success: true, msg: "Successfully liked review" });
       } else {
         return res

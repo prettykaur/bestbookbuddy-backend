@@ -48,6 +48,15 @@ const {
 // Initialise controllers
 const usersController = new UsersController(user);
 const booksController = new BooksController(book);
+const activitiesController = new ActivitiesController(
+  activity,
+  user,
+  book,
+  bookreview,
+  userbook,
+  collection,
+  discussion
+);
 const friendsController = new FriendsController(
   user,
   friendrequest,
@@ -59,14 +68,22 @@ const libraryController = new LibraryController(
   readingstatus,
   user
 );
-const reviewsController = new ReviewsController(bookreview, book, user);
+const reviewsController = new ReviewsController(
+  bookreview,
+  book,
+  user,
+  activity
+);
 const collectionsController = new CollectionsController(collection, book, user);
 const discussionsController = new DiscussionsController(discussion, book, user);
-const activitiesController = new ActivitiesController(activity);
 
 // Initialise routers
 const usersRouter = new UsersRouter(usersController, checkJwt).routes();
 const booksRouter = new BooksRouter(booksController, checkJwt).routes();
+const activitiesRouter = new ActivitiesRouter(
+  activitiesController,
+  checkJwt
+).routes();
 const friendsRouter = new FriendsRouter(friendsController, checkJwt).routes();
 const libraryRouter = new LibraryRouter(libraryController, checkJwt).routes();
 const reviewsRouter = new ReviewsRouter(reviewsController, checkJwt).routes();
@@ -76,10 +93,6 @@ const collectionsRouter = new CollectionsRouter(
 ).routes();
 const discussionsRouter = new DiscussionsRouter(
   discussionsController,
-  checkJwt
-).routes();
-const activitiesRouter = new ActivitiesRouter(
-  activitiesController,
   checkJwt
 ).routes();
 
@@ -93,12 +106,12 @@ app.use(express.urlencoded({ extended: false }));
 // Use routers
 app.use("/users", usersRouter);
 app.use("/books", booksRouter);
+app.use("/feed", activitiesRouter);
 app.use("/friends", friendsRouter);
 app.use("/library", libraryRouter);
 app.use("/reviews", reviewsRouter);
 app.use("/collections", collectionsRouter);
 app.use("/discussions", discussionsRouter);
-app.use("/feed", activitiesRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
