@@ -8,6 +8,7 @@ class ActivitiesRouter {
   }
 
   routes() {
+    router.get("/:userId", this.checkJwt, this.controller.getFeedForUser);
     return router;
   }
 }

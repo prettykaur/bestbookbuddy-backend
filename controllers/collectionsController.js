@@ -1,10 +1,11 @@
 const BaseController = require("./baseController");
 
 class CollectionsController extends BaseController {
-  constructor(model, bookModel, userModel) {
+  constructor(model, bookModel, userModel, activityModel) {
     super(model);
     this.bookModel = bookModel;
     this.userModel = userModel;
+    this.activityModel = activityModel;
   }
 
   // Get all collections
@@ -83,6 +84,19 @@ class CollectionsController extends BaseController {
         name,
         description,
       });
+
+      // Log activity
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "created",
+          targetId: newCollection.id,
+          targetType: "collection",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
+      }
+
       return res.json(newCollection);
     } catch (err) {
       console.log("Error creating new collection:", err);
@@ -113,6 +127,33 @@ class CollectionsController extends BaseController {
       }
 
       await collection.addBook(book);
+
+      // Get the collection with its books
+      const updatedCollection = await this.model.findOne({
+        where: { id: collectionId, userId },
+        include: [
+          {
+            model: this.bookModel,
+            where: { id: bookId },
+            through: { attributes: ["id"] },
+          },
+        ],
+      });
+
+      // The added book should be the only one in updatedCollection.books
+      const collectionBook = updatedCollection.books[0];
+
+      // Log activity
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "created",
+          targetId: collectionBook.id, // collection_books id
+          targetType: "collectionbook",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
+      }
 
       return res.json({
         success: true,
@@ -150,6 +191,18 @@ class CollectionsController extends BaseController {
           ],
         });
 
+        // Log activity
+        try {
+          await this.activityModel.create({
+            userId,
+            activityType: "updated",
+            targetId: updatedCollection.id,
+            targetType: "collection",
+          });
+        } catch (activityError) {
+          console.log("Failed to log activity:", activityError);
+        }
+
         return res.json({
           success: true,
           msg: "Collection updated",
@@ -173,6 +226,13 @@ class CollectionsController extends BaseController {
     try {
       const collection = await this.model.findOne({
         where: { id: collectionId, userId },
+        include: [
+          {
+            model: this.bookModel,
+            where: { id: bookId },
+            through: { attributes: ["id"] },
+          },
+        ],
       });
 
       if (!collection) {
@@ -181,18 +241,30 @@ class CollectionsController extends BaseController {
           .json({ error: true, msg: "Collection not found" });
       }
 
-      const book = await this.bookModel.findByPk(bookId);
+      const collectionBook = collection.books[0];
 
-      if (!book) {
+      if (!collectionBook) {
         return res.status(404).json({ error: true, msg: "Book not found" });
       }
 
-      await collection.removeBook(book);
+      // Log activity before removing the book
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "deleted",
+          targetId: collectionBook.id,
+          targetType: "collectionbook",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
+      }
+
+      await collection.removeBook(collectionBook);
 
       return res.json({
         success: true,
         msg: "Book removed from collection",
-        book,
+        collectionBook,
         collection,
       });
     } catch (err) {
@@ -214,6 +286,18 @@ class CollectionsController extends BaseController {
         return res
           .status(404)
           .json({ error: true, msg: "Collection not found" });
+      }
+
+      // Log activity before deleting the collection
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "deleted",
+          targetId: collectionId,
+          targetType: "collection",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
       }
 
       const booksInCollection = await collection.getBooks();

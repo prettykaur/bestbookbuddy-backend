@@ -2,10 +2,16 @@ const BaseController = require("./baseController");
 const { Op } = require("sequelize");
 
 class FriendsController extends BaseController {
-  constructor(model, friendRequestModel, friendRequestStatusModel) {
+  constructor(
+    model,
+    friendRequestModel,
+    friendRequestStatusModel,
+    activityModel
+  ) {
     super(model);
     this.friendRequestModel = friendRequestModel;
     this.friendRequestStatusModel = friendRequestStatusModel;
+    this.activityModel = activityModel;
   }
 
   // Get friends of user - OK
@@ -180,7 +186,7 @@ class FriendsController extends BaseController {
   // Accept/reject friend request
   updateFriendRequestStatus = async (req, res) => {
     const { userId, requestId } = req.params;
-    const { status } = req.body;
+    const { statusId } = req.body;
 
     try {
       // Find the friend request
@@ -215,25 +221,47 @@ class FriendsController extends BaseController {
       }
 
       // Update friend request status
-      friendRequest.statusId = status;
+      friendRequest.statusId = statusId;
       await friendRequest.save();
 
       // If request is accepted, create friendship in friends table
-      if (status === 2) {
+      if (statusId === 2) {
         const senderId = friendRequest.senderId;
         const recipientId = friendRequest.recipientId;
 
-        await this.model.findByPk(senderId).then((sender) => {
-          sender.addUser2Friends(recipientId);
-        });
+        const sender = await this.model.findByPk(senderId);
+        await sender.addUser2Friends(recipientId);
 
-        await this.model.findByPk(recipientId).then((recipient) => {
-          recipient.addUser1Friends(senderId);
-        });
+        const recipient = await this.model.findByPk(recipientId);
+        await recipient.addUser1Friends(senderId);
+
+        // Log activity for recipient
+        try {
+          await this.activityModel.create({
+            userId: recipientId,
+            activityType: "created",
+            targetId: senderId,
+            targetType: "friends",
+          });
+        } catch (activityError) {
+          console.log("Failed to log activity:", activityError);
+        }
+
+        // Log activity for sender
+        try {
+          await this.activityModel.create({
+            userId: senderId,
+            activityType: "created",
+            targetId: recipientId,
+            targetType: "friends",
+          });
+        } catch (activityError) {
+          console.log("Failed to log activity:", activityError);
+        }
       }
 
       // If request is rejected, update status in friend requests table
-      if (status === 3) {
+      if (statusId === 3) {
         await this.friendRequestModel.update(
           { statusId: 3 },
           { where: { id: requestId } }

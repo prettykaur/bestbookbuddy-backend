@@ -167,6 +167,18 @@ class ReviewsController extends BaseController {
         return res.status(404).json({ error: true, msg: "Review not found" });
       }
 
+      // Log activity
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "deleted",
+          targetId: existingReview.id,
+          targetType: "review",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
+      }
+
       // Fetch and delete all likes associated with review
       await existingReview.removeLikedBy(existingReview.likedBy);
 
@@ -277,6 +289,17 @@ class ReviewsController extends BaseController {
       const bookReview = await this.model.findByPk(reviewId);
 
       if (user && bookReview) {
+        // Log activity
+        try {
+          await this.activityModel.create({
+            userId,
+            activityType: "unliked",
+            targetId: reviewId,
+            targetType: "review",
+          });
+        } catch (activityError) {
+          console.log("Failed to log activity:", activityError);
+        }
         await user.removeLikedReviews(bookReview);
         return res.json({ success: true, msg: "Successfully unliked review" });
       } else {
