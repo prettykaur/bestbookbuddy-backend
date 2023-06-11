@@ -48,25 +48,54 @@ const {
 // Initialise controllers
 const usersController = new UsersController(user);
 const booksController = new BooksController(book);
+const activitiesController = new ActivitiesController(
+  activity,
+  user,
+  book,
+  bookreview,
+  userbook,
+  collection,
+  discussion
+);
 const friendsController = new FriendsController(
   user,
   friendrequest,
-  friendrequeststatus
+  friendrequeststatus,
+  activity
 );
 const libraryController = new LibraryController(
   userbook,
   book,
   readingstatus,
-  user
+  user,
+  activity
 );
-const reviewsController = new ReviewsController(bookreview, book, user);
-const collectionsController = new CollectionsController(collection, book, user);
-const discussionsController = new DiscussionsController(discussion, book, user);
-const activitiesController = new ActivitiesController(activity);
+const reviewsController = new ReviewsController(
+  bookreview,
+  book,
+  user,
+  activity
+);
+const collectionsController = new CollectionsController(
+  collection,
+  book,
+  user,
+  activity
+);
+const discussionsController = new DiscussionsController(
+  discussion,
+  book,
+  user,
+  activity
+);
 
 // Initialise routers
 const usersRouter = new UsersRouter(usersController, checkJwt).routes();
 const booksRouter = new BooksRouter(booksController, checkJwt).routes();
+const activitiesRouter = new ActivitiesRouter(
+  activitiesController,
+  checkJwt
+).routes();
 const friendsRouter = new FriendsRouter(friendsController, checkJwt).routes();
 const libraryRouter = new LibraryRouter(libraryController, checkJwt).routes();
 const reviewsRouter = new ReviewsRouter(reviewsController, checkJwt).routes();
@@ -78,10 +107,6 @@ const discussionsRouter = new DiscussionsRouter(
   discussionsController,
   checkJwt
 ).routes();
-const activitiesRouter = new ActivitiesRouter(
-  activitiesController,
-  checkJwt
-).routes();
 
 // Enable CORS
 app.use(cors());
@@ -91,14 +116,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Use routers
+app.use((req, res, next) => {
+  console.log(req.headers.authorization); // Print the Authorization header
+  next();
+});
+
 app.use("/users", usersRouter);
 app.use("/books", booksRouter);
+app.use("/feed", activitiesRouter);
 app.use("/friends", friendsRouter);
 app.use("/library", libraryRouter);
 app.use("/reviews", reviewsRouter);
 app.use("/collections", collectionsRouter);
 app.use("/discussions", discussionsRouter);
-app.use("/feed", activitiesRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");

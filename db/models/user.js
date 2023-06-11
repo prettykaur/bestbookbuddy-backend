@@ -15,8 +15,9 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "recipient_id",
         as: "recipientRequests",
       });
-      this.hasMany(models.activity, { foreignKey: "user_id" });
-      this.hasMany(models.activity, { foreignKey: "buyer_id" });
+      this.hasMany(models.activity, {
+        foreignKey: "user_id",
+      });
 
       this.belongsToMany(models.bookreview, {
         through: "book_review_likes",

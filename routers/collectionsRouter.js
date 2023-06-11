@@ -13,6 +13,7 @@ class CollectionsRouter {
 
     router.get("/:userId", this.controller.getUserCollections);
     router.get("/:userId/:collectionId", this.controller.getCollectionInfo);
+
     router.post(
       "/:userId/:collectionId",
       this.checkJwt,

@@ -1,11 +1,12 @@
 const BaseController = require("./baseController");
 
 class LibraryController extends BaseController {
-  constructor(model, bookModel, readingStatusModel, userModel) {
+  constructor(model, bookModel, readingStatusModel, userModel, activityModel) {
     super(model);
     this.bookModel = bookModel;
     this.readingStatusModel = readingStatusModel;
     this.userModel = userModel;
+    this.activityModel = activityModel;
   }
 
   // Get books in library
@@ -185,6 +186,18 @@ class LibraryController extends BaseController {
         ],
       });
 
+      // Log activity
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "created",
+          targetId: newUserBook.id,
+          targetType: "library",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
+      }
+
       return res.json(newUserBook);
     } catch (err) {
       console.log("Error adding book to library:", err);
@@ -269,6 +282,18 @@ class LibraryController extends BaseController {
 
       // Reload to get updated status
       await userBook.reload();
+
+      // Log activity
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "updated",
+          targetId: userBook.id,
+          targetType: "library",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
+      }
 
       return res.json({
         success: true,

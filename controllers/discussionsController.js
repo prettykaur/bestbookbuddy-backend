@@ -2,10 +2,11 @@ const BaseController = require("./baseController");
 const { Op } = require("sequelize");
 
 class DiscussionsController extends BaseController {
-  constructor(model, bookModel, userModel) {
+  constructor(model, bookModel, userModel, activityModel) {
     super(model);
     this.bookModel = bookModel;
     this.userModel = userModel;
+    this.activityModel = activityModel;
   }
 
   // Get list of all discussions
@@ -195,6 +196,18 @@ class DiscussionsController extends BaseController {
         parentId: null,
       });
 
+      // Log activity
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "created",
+          targetId: newDiscussion.id,
+          targetType: "discussion",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
+      }
+
       const discussionWithAssociations = await this.model.findOne({
         where: { id: newDiscussion.id },
         include: [
@@ -246,6 +259,18 @@ class DiscussionsController extends BaseController {
         body,
         parentId: discussionId,
       });
+
+      // Log activity
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "created",
+          targetId: newComment.id,
+          targetType: "comment",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
+      }
 
       const commentWithAssociations = await this.model.findOne({
         where: { id: newComment.id },
@@ -302,7 +327,43 @@ class DiscussionsController extends BaseController {
       // Fetch updated discussion
       const updatedDiscussion = await this.model.findByPk(discussionId);
 
-      return res.json(updatedDiscussion);
+      // Log activity
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "updated",
+          targetId: discussionId,
+          targetType: "discussion",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
+      }
+
+      const discussionWithAssociations = await this.model.findOne({
+        where: { id: updatedDiscussion.id },
+        include: [
+          {
+            model: this.userModel,
+            attributes: ["id", "username", "email", "photoUrl"],
+          },
+          {
+            model: this.bookModel,
+            attributes: ["id", "title", "olCoverId", "authorName"],
+          },
+          {
+            model: this.model,
+            as: "children",
+            include: [
+              {
+                model: this.userModel,
+                attributes: ["id", "username", "email", "photoUrl"],
+              },
+            ],
+          },
+        ],
+      });
+
+      return res.json(discussionWithAssociations);
     } catch (err) {
       console.log("Error updating discussion:", err);
       return res.status(500).json({ error: true, msg: err.message });
@@ -330,7 +391,43 @@ class DiscussionsController extends BaseController {
       // Fetch updated comment
       const updatedComment = await this.model.findByPk(commentId);
 
-      return res.json(updatedComment);
+      // Log activity
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "updated",
+          targetId: commentId,
+          targetType: "comment",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
+      }
+
+      const commentWithAssociations = await this.model.findOne({
+        where: { id: updatedComment.id },
+        include: [
+          {
+            model: this.userModel,
+            attributes: ["id", "username", "email", "photoUrl"],
+          },
+          {
+            model: this.bookModel,
+            attributes: ["id", "title", "olCoverId", "authorName"],
+          },
+          {
+            model: this.model,
+            as: "parentDiscussion",
+            include: [
+              {
+                model: this.userModel,
+                attributes: ["id", "username", "email", "photoUrl"],
+              },
+            ],
+          },
+        ],
+      });
+
+      return res.json(commentWithAssociations);
     } catch (err) {
       console.log("Error updating comment:", err);
       return res.status(500).json({ error: true, msg: err.message });
@@ -360,6 +457,18 @@ class DiscussionsController extends BaseController {
         return res.status(404).json({ error: true, msg: "Comments not found" });
       }
 
+      // Log activity before deleting the discussion
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "deleted",
+          targetId: discussionId,
+          targetType: "discussion",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
+      }
+
       await this.model.destroy({ where: { parentId: discussionId } });
 
       await this.model.destroy({ where: { id: discussionId, parentId: null } });
@@ -383,6 +492,18 @@ class DiscussionsController extends BaseController {
 
       if (!comment) {
         return res.status(404).json({ error: true, msg: "Comment not found" });
+      }
+
+      // Log activity before deleting the comment
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "deleted",
+          targetId: commentId,
+          targetType: "comment",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
       }
 
       await this.model.destroy({ where: { id: comment.id } });
@@ -581,6 +702,18 @@ class DiscussionsController extends BaseController {
 
       await discussion.addLikingUser(user);
 
+      // Log activity
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "liked",
+          targetId: discussionId,
+          targetType: "discussion",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
+      }
+
       return res.json({
         success: true,
         msg: "Discussion liked successfully",
@@ -630,6 +763,18 @@ class DiscussionsController extends BaseController {
         return res
           .status(400)
           .json({ error: true, msg: "User has not liked this discussion yet" });
+      }
+
+      // Log activity
+      try {
+        await this.activityModel.create({
+          userId,
+          activityType: "unliked",
+          targetId: discussionId,
+          targetType: "discussion",
+        });
+      } catch (activityError) {
+        console.log("Failed to log activity:", activityError);
       }
 
       await discussion.removeLikingUser(user);
