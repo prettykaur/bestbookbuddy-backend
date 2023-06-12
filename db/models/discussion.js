@@ -46,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
         field: "title",
       },
       body: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         field: "body",
       },
       parentId: {
