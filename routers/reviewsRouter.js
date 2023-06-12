@@ -9,6 +9,12 @@ class ReviewsRouter {
 
   routes() {
     router.get("/:bookId", this.controller.getBookReviews);
+    router.get("/user/:userId", this.controller.getAllUserBookReviews);
+    router.get(
+      "/user/:userId/book/:bookId",
+      this.controller.getOneUserBookReview
+    );
+
     router.post("/:bookId", this.checkJwt, this.controller.addBookReview);
     router.put("/:reviewId", this.checkJwt, this.controller.updateBookReview);
     router.delete(

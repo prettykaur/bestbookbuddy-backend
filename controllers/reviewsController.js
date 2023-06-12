@@ -22,16 +22,61 @@ class ReviewsController extends BaseController {
           },
           {
             model: this.bookModel,
-            attributes: ["id", "title"],
           },
         ],
       });
 
-      if (reviews.length === 0) {
-        return res.status(404).json({ error: true, msg: "No reviews found" });
-      }
+      return res.json(reviews);
+    } catch (err) {
+      console.log("Error fetching reviews:", err);
+      return res.status(400).json({ error: true, msg: err });
+    }
+  };
+
+  // Get all book reviews of user
+  getAllUserBookReviews = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+      const reviews = await this.model.findAll({
+        where: { userId },
+        include: [
+          {
+            model: this.userModel,
+            attributes: ["id", "username", "email", "photoUrl"],
+          },
+          {
+            model: this.bookModel,
+          },
+        ],
+      });
 
       return res.json(reviews);
+    } catch (err) {
+      console.log("Error fetching reviews:", err);
+      return res.status(400).json({ error: true, msg: err });
+    }
+  };
+
+  // Get single book review of user
+  getOneUserBookReview = async (req, res) => {
+    const { userId, bookId } = req.params;
+
+    try {
+      const review = await this.model.findOne({
+        where: { userId, bookId },
+        include: [
+          {
+            model: this.userModel,
+            attributes: ["id", "username", "email", "photoUrl"],
+          },
+          {
+            model: this.bookModel,
+          },
+        ],
+      });
+
+      return res.json(review);
     } catch (err) {
       console.log("Error fetching reviews:", err);
       return res.status(400).json({ error: true, msg: err });
