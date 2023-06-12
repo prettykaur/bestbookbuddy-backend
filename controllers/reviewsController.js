@@ -22,14 +22,9 @@ class ReviewsController extends BaseController {
           },
           {
             model: this.bookModel,
-            attributes: ["id", "title"],
           },
         ],
       });
-
-      if (reviews.length === 0) {
-        return res.status(404).json({ error: true, msg: "No reviews found" });
-      }
 
       return res.json(reviews);
     } catch (err) {
