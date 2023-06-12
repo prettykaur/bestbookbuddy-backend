@@ -24,6 +24,14 @@ class ActivitiesController extends BaseController {
   // Get user feed
   getFeedForUser = async (req, res) => {
     const { userId } = req.params;
+    let { page, limit } = req.query;
+
+    // Set default values for page and limit
+    page = isNaN(page) || page <= 0 ? 1 : parseInt(page); // Default to page 1
+    limit = isNaN(limit) || limit <= 0 ? 10 : parseInt(limit); // Default to 10 items per page
+
+    // Calculate offset
+    const offset = (page - 1) * limit;
 
     try {
       // Fetch the user
@@ -48,6 +56,8 @@ class ActivitiesController extends BaseController {
       const activities = await this.model.findAll({
         where: { user_id: { [Op.in]: friendIds } },
         order: [["createdAt", "DESC"]],
+        limit: limit,
+        offset: offset,
         include: [
           {
             model: this.userModel,
